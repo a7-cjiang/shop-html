@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>支付</title>
+    <script src="/js/qrcode.min.js"></script>
+    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+<div id="qrcode"></div>
+</body>
+<script type="text/javascript">
+
+    // 进行ajax的全局设置
+    $.ajaxSetup({
+        //data:{"name":sessionStorage.getItem("token")}
+        headers: {
+            'token': sessionStorage.getItem("login_token")
+        },
+        //数据加载完成后
+        complete:function(a,b,c){
+            var data=a.responseJSON;
+            if(data.code==1000){
+                alert(data.message);
+                location.href="login.html"
+            }
+            //debugger
+        }
+        /* beforeSend: function(xhr) {
+             debugger;
+             xhr.setRequestHeader("token:'"+sessionStorage.getItem("login_token")+"'");
+         }*/
+    });
+
+
+    orderId = sessionStorage.getItem("orderId")
+    money = sessionStorage.getItem("money")
+debugger
+
+    $(function () {
+        initOrder()
+    })
+
+
+    function initOrder(){
+        // alert(orderId)
+        // alert(money)
+        $.get({
+            url:"http://192.168.1.160:8088/order/createCode.do",
+            dataType:"json",
+            data:{"orderId":orderId,"money":money},
+            success:function (data) {
+                // alert(data.code)
+                if (data.code == 200){
+                    // alert(data.data)
+                    new QRCode(document.getElementById("qrcode"), data.data);  // 设置要生成二维码的链接
+                }else {
+                    alert("生成二维码失败")
+                }
+            },error:function () {
+                alert("请求生成二维码异常")
+            }
+        })
+    }
+
+
+
+
+
+</script>
+</html>
